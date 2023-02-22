@@ -2,6 +2,7 @@ version: "3.9"
 services:
   # XSS Hunter Express service
   xsshunterexpress:
+    container_name: ${CONTAINER_NAME}
     build: .
     environment:
       # [REQUIRED] The hostname/domain pointed to 
@@ -80,6 +81,12 @@ services:
       POSTGRES_PASSWORD: xsshunterexpress
     volumes:
       - ${POSTGRES_DB_DATA}:/var/lib/postgresql/data/pgdata
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxynetwork"
+      - "traefik.http.routers.${CONTAINER_NAME}.tls=true"
+      - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=https"
+      - "traefik.http.routers.${CONTAINER_NAME}.rule=Host(`${HOST}`)"      
      
 networks:
   default:
