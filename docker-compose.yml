@@ -6,14 +6,14 @@ services:
     environment:
       # [REQUIRED] The hostname/domain pointed to 
       # the IP of the server running this service. 
-      - HOSTNAME=your.host.name
+      - HOSTNAME=${CONTAINER_NAME}
       # Whether or not to enable SSL
       # If set, SSL will automatically be set up and
       # renewed with LetsEncrypt.
-      - SSL_ENABLED=true
+      - SSL_ENABLED=false
       # Email for SSL
       # Required if SSL is enabled.
-      - SSL_CONTACT_EMAIL=YourEmail@gmail.com
+      # - SSL_CONTACT_EMAIL=xxxx
       # Maximum XSS callback payload size
       # This includes the webpage screenshot, DOM HTML,
       # page text, and other metadata. Note that if the
@@ -23,17 +23,17 @@ services:
       # Whether or not to enable the web control panel
       # Set to "false" or remove to disable the web UI.
       # Useful for minimizing attack surface.
-      - CONTROL_PANEL_ENABLED=true
+      - CONTROL_PANEL_ENABLED=${CONTROL_PANEL_SWITCH}
       # Whether or not to enable email notifications via
       # SMTP for XSS payload fires.
       - SMTP_EMAIL_NOTIFICATIONS_ENABLED=true
-      - SMTP_HOST=smtp.gmail.com
-      - SMTP_PORT=465
-      - SMTP_USE_TLS=true
-      - SMTP_USERNAME=YourEmail@gmail.com
-      - SMTP_PASSWORD=YourEmailPassword
-      - SMTP_FROM_EMAIL=YourEmail@gmail.com
-      - SMTP_RECEIVER_EMAIL=YourEmail@gmail.com
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USE_TLS=${SMTP_USE_TLS}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
+      - SMTP_RECEIVER_EMAIL=${SMTP_RECEIVER_EMAIL}
       # THERE IS NO NEED TO MODIFY BELOW THIS LINE
       # ------------------------------------------
       # FEEL FREE, BUT KNOW WHAT YOU'RE DOING.
@@ -45,16 +45,16 @@ services:
       - DATABASE_HOST=postgresdb
       - NODE_ENV=production
     ports:
-      - "80:80"
-      - "443:443"
+      - ${HTTP_PORT}:80
+      - ${HTTPS_PORT}:443
     volumes:
       # Stores the SSL/TLS certificates and keys
       # in the "ssldata" directory.
       # Your certificates are automatically renewed
       # via LetsEncrypt, no extra work needed!
-      - ./ssldata:/app/greenlock.d
+      - ${LETS_ENCRYPT_FOLDER}:/app/greenlock.d
       # Directory where payload fire images are stored.
-      - ./payload-fire-images:/app/payload-fire-images
+      - ${PAYLOAD_FIRE_IMAGES}:/app/payload-fire-images
     # Comment out if you're using an external SQL
     # server and have commented out the DB section.
     depends_on:
@@ -79,4 +79,9 @@ services:
       POSTGRES_DB: xsshunterexpress
       POSTGRES_PASSWORD: xsshunterexpress
     volumes:
-      - ./postgres-db-data:/var/lib/postgresql/data/pgdata
+      - ${POSTGRES_DB_DATA}:/var/lib/postgresql/data/pgdata
+     
+networks:
+  default:
+    external: true
+    name: backend
