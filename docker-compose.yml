@@ -56,6 +56,13 @@ services:
       # - ./ssldata:/app/greenlock.d
       # Directory where payload fire images are stored.
       - ${PAYLOAD_FIRE_IMAGES}:/app/payload-fire-images
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxynetwork"
+      - "traefik.http.routers.${CONTAINER_NAME}.tls=true"
+      - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=https"
+      - "traefik.http.routers.${CONTAINER_NAME}.rule=Host(`${HOST_NAME}`)"
+      
     # Comment out if you're using an external SQL
     # server and have commented out the DB section.
     depends_on:
@@ -81,12 +88,6 @@ services:
       POSTGRES_PASSWORD: xsshunterexpress
     volumes:
       - ${POSTGRES_DB_DATA}:/var/lib/postgresql/data/pgdata
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxynetwork"
-      - "traefik.http.routers.${CONTAINER_NAME}.tls=true"
-      - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=https"
-      - "traefik.http.routers.${CONTAINER_NAME}.rule=Host(`${HOST_NAME}`)"      
      
 networks:
   default:
